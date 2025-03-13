@@ -9,8 +9,7 @@ This tool is optimized for retrieving documentation and reference materials from
 ## Features
 
 * Retrieve content from websites that implement advanced bot protection
-* Multiple browser options (basic, stealth, playwright)
-* CSS selector-based content extraction
+* Multiple browser options (basic, stealth)
 * Multiple output formats (text, HTML)
 
 ## Installation

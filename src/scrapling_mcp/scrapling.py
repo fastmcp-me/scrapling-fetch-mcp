@@ -14,13 +14,6 @@ class QuickBrowsingRequest(BaseModel):
         None, description="CSS selector to extract specific content"
     )
     format: str = Field("text", description="Output format (text or html)")
-    auto_match: bool = Field(
-        False,
-        description="Use Scrapling's auto-matching to find elements after website changes",
-    )
-    auto_save: bool = Field(
-        False, description="Save element information for future auto-matching"
-    )
     network_idle: bool = Field(
         True, description="Wait for network to be idle before scraping"
     )
@@ -33,6 +26,10 @@ class QuickBrowsingRequest(BaseModel):
 
 class StealthyBrowsingRequest(BaseModel):
     url: str = Field(..., description="URL to browse")
+    selector: Optional[str] = Field(
+        None, description="CSS selector to extract specific content"
+    )
+    format: str = Field("text", description="Output format (text or html)")
     headless: bool = Field(
         True,
         description="Run browser in headless (invisible) mode by default. Setting to False shows the browser window, which can help bypass certain bot detection systems but may interrupt your workflow.",
@@ -79,14 +76,9 @@ async def quick_browse(request: QuickBrowsingRequest) -> str:
     return _extract_content(page, request)
 
 
-def _extract_content(page, request: QuickBrowsingRequest) -> str:
+def _extract_content(page, request) -> str:
     if request.selector:
-        if request.auto_match:
-            elements = page.css(request.selector, auto_match=True)
-        elif request.auto_save:
-            elements = page.css(request.selector, auto_save=True)
-        else:
-            elements = page.css(request.selector)
+        elements = page.css(request.selector)
 
         if request.format == "text":
             return "\n".join([el.text for el in elements])
@@ -111,4 +103,4 @@ async def stealthy_browse(request: StealthyBrowsingRequest) -> str:
         timeout=request.timeout,
         proxy=request.proxy,
     )
-    return page.get_all_text(ignore_tags=("script", "style"))
+    return _extract_content(page, request)
