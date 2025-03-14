@@ -4,7 +4,7 @@ A simple Model Context Protocol (MCP) server implementation that integrates with
 
 ## Intended Use
 
-This tool is optimized for low volume retrieval of documentation and reference materials from websites that implement bot detection. It has not been designed or tested for general-purpose site scraping or data harvesting.
+This tool is optimized for low volume retrieval of documentation and reference materials (text/html only) from websites that implement bot detection. It has not been designed or tested for general-purpose site scraping or data harvesting.
 
 ## Features
 
