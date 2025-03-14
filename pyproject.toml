@@ -25,7 +25,7 @@ dependencies = [
 "Bug Tracker" = "https://github.com/cyberchitta/scrapling-fetch-mcp/issues"
 
 [project.scripts]
-scrapling-fetch-mcp = "scrapling_mcp.mcp:run_server"
+scrapling-fetch-mcp = "scrapling_fetch_mcp.mcp:run_server"
 
 [build-system]
 requires = ["hatchling"]

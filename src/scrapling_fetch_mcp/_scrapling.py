@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from scrapling.defaults import AsyncFetcher, StealthyFetcher
 from readabilipy import simple_tree_from_html_string
-from scrapling_mcp._markdownify import _CustomMarkdownify
+from scrapling_fetch_mcp._markdownify import _CustomMarkdownify
 
 
 class UrlFetchRequest(BaseModel):
