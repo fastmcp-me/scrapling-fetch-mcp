@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel, Field
 from scrapling.defaults import AsyncFetcher, StealthyFetcher
 from readabilipy import simple_tree_from_html_string
@@ -11,6 +10,19 @@ class UrlFetchRequest(BaseModel):
         "basic", description="Fetching mode (basic, stealth, or max-stealth)"
     )
     format: str = Field("markdown", description="Output format (html or markdown)")
+    max_length: int = Field(
+        5000, 
+        description="Maximum number of characters to return.",
+        gt=0,
+        lt=1000000,
+        title="Max Length"
+    )
+    start_index: int = Field(
+        0, 
+        description="On return output starting at this character index, useful if a previous fetch was truncated and more context is required.",
+        ge=0,
+        title="Start Index"
+    )
 
 
 async def fetch_url(request: UrlFetchRequest) -> str:
@@ -31,7 +43,8 @@ async def fetch_url(request: UrlFetchRequest) -> str:
         )
     else:
         raise ValueError(f"Unknown mode: {request.mode}")
-    return _extract_content(page, request)
+    content = _extract_content(page, request)
+    return content[request.start_index:request.start_index + request.max_length]
 
 
 def _extract_content(page, request) -> str:
