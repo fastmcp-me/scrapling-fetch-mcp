@@ -42,29 +42,33 @@ Add this configuration to your Claude client's MCP server configuration:
 
 ## Available Tools
 
-### fetch_url
+### scrapling-fetch
 
 Fetch a URL with configurable bot-detection avoidance levels.
 
 ```json
 {
-  "name": "fetch_url",
+  "name": "scrapling-fetch",
   "arguments": {
     "url": "https://example.com",
     "mode": "stealth",
-    "format": "markdown"
+    "format": "markdown",
+    "max_length": 5000,
+    "start_index": 0
   }
 }
 ```
 
 #### Parameters
 
-- **url**: The URL to fetch
-- **mode**: Protection level (options: `basic`, `stealth`, `max-stealth`)
+- **url** (required): The URL to fetch
+- **mode** (optional, default: "basic"): Protection level
   - `basic`: Fast retrieval with minimal protection
   - `stealth`: Balanced protection against bot detection
   - `max-stealth`: Maximum protection with all anti-detection features
-- **format**: Output format (options: `html`, `markdown`)
+- **format** (optional, default: "markdown"): Output format (options: `html`, `markdown`)
+- **max_length** (optional, default: 5000): Maximum number of characters to return
+- **start_index** (optional, default: 0): Character index to start from in the response (useful for paginated content)
 
 ## License
 
