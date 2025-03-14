@@ -12,7 +12,8 @@ from scrapling_fetch_mcp._scrapling import UrlFetchRequest, fetch_url
 scrapling_fetch_tool = Tool(
     name="scrapling-fetch",
     description="Fetches a URL using Scrapling with bot-detection avoidance. "
-    "Supports three modes: basic (fast), stealth (balanced), and max-stealth (maximum protection). "
+    "For best performance, start with 'basic' mode (fastest), then only escalate to "
+    "'stealth' or 'max-stealth' modes if basic mode fails to retrieve the content. "
     "Returns HTML or markdown content.",
     inputSchema=UrlFetchRequest.model_json_schema(),
 )
