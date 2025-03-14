@@ -2,6 +2,8 @@
 
 A simple Model Context Protocol (MCP) server implementation that integrates with [Scrapling](https://github.com/D4Vinci/Scrapling) for retrieving web content with advanced bot detection avoidance.
 
+> **Note**: This project was developed in collaboration with Claude Sonnet 3.7, using [LLM Context](https://github.com/cyberchitta/llm-context.py) to share code during development. Initial vibe code session with Sonnet to get to a working prototype + several curation sessions where I (@restlessronin) refactored and refined with Sonnet's feedback.
+
 ## Intended Use
 
 This tool is optimized for low volume retrieval of documentation and reference materials (text/html only) from websites that implement bot detection. It has not been designed or tested for general-purpose site scraping or data harvesting.
