@@ -1557,7 +1557,7 @@ wheels = [
 ]
 
 [[package]]
-name = "scrapling-mcp"
+name = "scrapling-fetch-mcp"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [

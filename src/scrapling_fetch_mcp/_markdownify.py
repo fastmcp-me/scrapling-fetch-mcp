@@ -1,10 +1,10 @@
 # from https://github.com/microsoft/markitdown/blob/main/packages/markitdown/src/markitdown/converters/_markdownify.py
 
 import re
-import markdownify
-
 from typing import Any, Optional
 from urllib.parse import quote, unquote, urlparse, urlunparse
+
+import markdownify
 
 
 class _CustomMarkdownify(markdownify.MarkdownConverter):
