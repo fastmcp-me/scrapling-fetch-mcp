@@ -7,46 +7,30 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INTERNAL_ERROR, INVALID_PARAMS, ErrorData, TextContent, Tool
 from pydantic import ValidationError
 
-from scrapling_mcp.scrapling import (
-    QuickBrowsingRequest,
-    StealthyBrowsingRequest,
-    quick_browse,
-    stealthy_browse,
-)
+from scrapling_mcp._scrapling import UrlFetchRequest, fetch_url
 
-quick_browse_tool = Tool(
-    name="scrapling_browse_quick",
-    description="Browses a webpage using Scrapling with bot-detection avoidance. "
-    "Supports basic and stealth browser types. "
-    "Returns full page content or specific elements based on CSS selectors.",
-    inputSchema=QuickBrowsingRequest.model_json_schema(),
-)
-
-stealthy_browse_tool = Tool(
-    name="scrapling_browse_stealth",
-    description="Performs advanced stealth browsing of a website with Scrapling's most powerful anti-detection capabilities. "
-    "Uses StealthyFetcher for maximum protection against bot detection with options for human-like behavior.",
-    inputSchema=StealthyBrowsingRequest.model_json_schema(),
+url_fetch_tool = Tool(
+    name="fetch_url",
+    description="Fetches a URL using Scrapling with bot-detection avoidance. "
+    "Supports three modes: basic (fast), stealth (balanced), and max-stealth (maximum protection). "
+    "Returns HTML or markdown content.",
+    inputSchema=UrlFetchRequest.model_json_schema(),
 )
 
 
 async def serve() -> None:
-    server: Server = Server("scrapling-mcp", pkg_ver("scrapling-mcp"))
+    server: Server = Server("scrapling-fetch-mcp", pkg_ver("scrapling-fetch-mcp"))
 
     @server.list_tools()
     async def handle_list_tools() -> list[Tool]:
-        return [quick_browse_tool, stealthy_browse_tool]
+        return [url_fetch_tool]
 
     @server.call_tool()
     async def handle_call_tool(name: str, arguments: dict) -> list[TextContent]:
         try:
-            if name == "scrapling_browse_quick":
-                request = QuickBrowsingRequest(**arguments)
-                content = await quick_browse(request)
-                return [TextContent(type="text", text=content)]
-            elif name == "scrapling_browse_stealth":
-                request = StealthyBrowsingRequest(**arguments)
-                content = await stealthy_browse(request)
+            if name == "fetch_url":
+                request = UrlFetchRequest(**arguments)
+                content = await fetch_url(request)
                 return [TextContent(type="text", text=content)]
             else:
                 raise McpError(
