@@ -9,8 +9,8 @@ from pydantic import ValidationError
 
 from scrapling_fetch_mcp._scrapling import UrlFetchRequest, fetch_url
 
-url_fetch_tool = Tool(
-    name="fetch_url",
+scrapling_fetch_tool = Tool(
+    name="scrapling-fetch",
     description="Fetches a URL using Scrapling with bot-detection avoidance. "
     "Supports three modes: basic (fast), stealth (balanced), and max-stealth (maximum protection). "
     "Returns HTML or markdown content.",
@@ -23,12 +23,12 @@ async def serve() -> None:
 
     @server.list_tools()
     async def handle_list_tools() -> list[Tool]:
-        return [url_fetch_tool]
+        return [scrapling_fetch_tool]
 
     @server.call_tool()
     async def handle_call_tool(name: str, arguments: dict) -> list[TextContent]:
         try:
-            if name == "fetch_url":
+            if name == "scrapling-fetch":
                 request = UrlFetchRequest(**arguments)
                 content = await fetch_url(request)
                 return [TextContent(type="text", text=content)]
