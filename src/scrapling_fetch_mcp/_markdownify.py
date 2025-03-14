@@ -52,7 +52,7 @@ class _CustomMarkdownify(markdownify.MarkdownConverter):
                 href = urlunparse(
                     parsed_url._replace(path=quote(unquote(parsed_url.path)))
                 )  # type: ignore
-            except ValueError:  # It's not clear if this ever gets thrown
+            except ValueError:
                 return "%s%s%s" % (prefix, text, suffix)
         if (
             self.options["autolinks"]
