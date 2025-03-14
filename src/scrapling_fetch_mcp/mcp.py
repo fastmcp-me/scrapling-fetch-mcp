@@ -16,7 +16,8 @@ scrapling_fetch_tool = Tool(
     description="Fetches a URL using Scrapling with bot-detection avoidance. "
     "For best performance, start with 'basic' mode (fastest), then only escalate to "
     "'stealth' or 'max-stealth' modes if basic mode fails to retrieve the content. "
-    "Returns HTML or markdown content.",
+    "Returns content prefixed by JSON metadata containing information about content "
+    "length, truncation, and retrieval statistics.",
     inputSchema=UrlFetchRequest.model_json_schema(),
 )
 
