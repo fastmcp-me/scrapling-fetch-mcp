@@ -1,4 +1,6 @@
 import asyncio
+import logging
+import traceback
 from importlib.metadata import version as pkg_ver
 
 from mcp.server import Server
@@ -31,8 +33,10 @@ async def serve() -> None:
         try:
             if name == "scrapling-fetch":
                 request = UrlFetchRequest(**arguments)
-                content = await fetch_url(request)
-                return [TextContent(type="text", text=content)]
+                result = await fetch_url(request)
+                metadata_json = result.metadata.model_dump_json()
+                content_with_metadata = f"METADATA: {metadata_json}\n\n{result.content}"
+                return [TextContent(type="text", text=content_with_metadata)]
             else:
                 raise McpError(
                     ErrorData(code=INVALID_PARAMS, message=f"Unknown tool: {name}")
@@ -40,6 +44,9 @@ async def serve() -> None:
         except ValidationError as e:
             raise McpError(ErrorData(code=INVALID_PARAMS, message=str(e)))
         except Exception as e:
+            logger = logging.getLogger("scrapling_fetch_mcp")
+            logger.error("DETAILED ERROR IN %s: %s", name, str(e))
+            logger.error("TRACEBACK: %s", traceback.format_exc())
             raise McpError(
                 ErrorData(
                     code=INTERNAL_ERROR, message=f"Error processing {name}: {str(e)}"

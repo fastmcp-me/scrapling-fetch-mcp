@@ -1,5 +1,7 @@
+from typing import Any
+
+from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
-from readabilipy import simple_tree_from_html_string
 from scrapling.defaults import AsyncFetcher, StealthyFetcher
 
 from scrapling_fetch_mcp._markdownify import _CustomMarkdownify
@@ -26,15 +28,30 @@ class UrlFetchRequest(BaseModel):
     )
 
 
-async def fetch_url(request: UrlFetchRequest) -> str:
+class UrlFetchResponse(BaseModel):
+    content: str
+    metadata: "UrlFetchResponse.Metadata" = Field(
+        default_factory=lambda: UrlFetchResponse.Metadata(),
+        description="Metadata about the content retrieval",
+    )
+
+    class Metadata(BaseModel):
+        total_length: int = 0
+        retrieved_length: int = 0
+        is_truncated: bool = False
+        start_index: int = 0
+        percent_retrieved: float = 100.0
+
+
+async def browse_url(request: UrlFetchRequest) -> Any:
     if request.mode == "basic":
-        page = await AsyncFetcher.get(request.url, stealthy_headers=True)
+        return await AsyncFetcher.get(request.url, stealthy_headers=True)
     elif request.mode == "stealth":
-        page = await StealthyFetcher.async_fetch(
+        return await StealthyFetcher.async_fetch(
             request.url, headless=True, network_idle=True
         )
     elif request.mode == "max-stealth":
-        page = await StealthyFetcher.async_fetch(
+        return await StealthyFetcher.async_fetch(
             request.url,
             headless=True,
             block_webrtc=True,
@@ -44,8 +61,6 @@ async def fetch_url(request: UrlFetchRequest) -> str:
         )
     else:
         raise ValueError(f"Unknown mode: {request.mode}")
-    content = _extract_content(page, request)
-    return content[request.start_index : request.start_index + request.max_length]
 
 
 def _extract_content(page, request) -> str:
@@ -53,6 +68,31 @@ def _extract_content(page, request) -> str:
     return _html_to_markdown(page.html_content) if is_markdown else page.html_content
 
 
-def _html_to_markdown(html: str, **kwargs) -> str:
-    tree = simple_tree_from_html_string(html)
-    return _CustomMarkdownify().convert_soup(tree)
+def _html_to_markdown(html: str) -> str:
+    soup = BeautifulSoup(html, "html.parser")
+    for script in soup(["script", "style"]):
+        script.extract()
+    body_elm = soup.find("body")
+    return _CustomMarkdownify().convert_soup(body_elm if body_elm else soup)
+
+
+async def fetch_url(request: UrlFetchRequest) -> UrlFetchResponse:
+    page = await browse_url(request)
+    full_content = _extract_content(page, request)
+    total_length = len(full_content)
+    truncated_content = full_content[
+        request.start_index : request.start_index + request.max_length
+    ]
+    is_truncated = total_length > (request.start_index + request.max_length)
+    return UrlFetchResponse(
+        content=truncated_content,
+        metadata=UrlFetchResponse.Metadata(
+            total_length=total_length,
+            retrieved_length=len(truncated_content),
+            is_truncated=is_truncated,
+            start_index=request.start_index,
+            percent_retrieved=round((len(truncated_content) / total_length) * 100, 2)
+            if total_length > 0
+            else 100,
+        ),
+    )
