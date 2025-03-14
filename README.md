@@ -36,7 +36,7 @@ Add this configuration to your Claude client's MCP server configuration:
   "mcpServers": {
     "Cyber-Chitta": {
       "command": "uvx",
-      "args": ["scrapling-fetch-mcp"]
+      "args": ["scrapling-fetch-mcp", ">", "/dev/null", "2>&1"]
     }
   }
 }
