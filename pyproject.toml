@@ -1,6 +1,6 @@
 [project]
 name = "scrapling-fetch-mcp"
-version = "0.0.1"
+version = "0.1.1"
 description = "Simple URL fetcher MCP server for Scrapling. Retrieves HTML/markdown from automation-blocking sites with three protection levels."
 readme = "README.md"
 authors = [

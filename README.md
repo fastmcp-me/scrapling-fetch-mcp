@@ -22,7 +22,7 @@ scrapling install
 ```
 
 ```bash
-uv tool install scrapling-mcp
+uv tool install scrapling-fetch-mcp
 ```
 
 ## Usage with Claude
