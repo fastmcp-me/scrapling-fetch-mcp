@@ -1,7 +1,7 @@
 [project]
 name = "scrapling-fetch-mcp"
 version = "0.1.4"
-description = "Helps LLMs access bot-protected websites. An MCP server that fetches HTML/markdown content from sites with anti-automation defenses using Scrapling."
+description = "Helps AI assistants access text content from bot-protected websites. MCP server that fetches HTML/markdown from sites with anti-automation measures using Scrapling."
 readme = "README.md"
 authors = [
     { name = "restlessronin", email = "88921269+restlessronin@users.noreply.github.com" },
