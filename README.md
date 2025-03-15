@@ -1,5 +1,8 @@
 # Scrapling Fetch MCP
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![PyPI version](https://img.shields.io/pypi/v/llm-context.svg)](https://pypi.org/project/scrapling-fetch-mcp/)
+
 Helps LLMs access bot-protected websites. An MCP server that fetches HTML/markdown content from sites with anti-automation defenses using Scrapling.
 
 ## Why This Exists
