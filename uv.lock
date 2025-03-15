@@ -1461,7 +1461,7 @@ wheels = [
 
 [[package]]
 name = "scrapling-fetch-mcp"
-version = "0.1.3"
+version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
