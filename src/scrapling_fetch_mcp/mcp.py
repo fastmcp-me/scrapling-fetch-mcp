@@ -9,7 +9,7 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INTERNAL_ERROR, INVALID_PARAMS, ErrorData, TextContent, Tool
 from pydantic import ValidationError
 
-from scrapling_fetch_mcp._scrapling import UrlFetchRequest, fetch_url
+from scrapling_fetch_mcp._fetcher import UrlFetchRequest, fetch_url
 
 scrapling_fetch_tool = Tool(
     name="scrapling-fetch",

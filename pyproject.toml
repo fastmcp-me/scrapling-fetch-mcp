@@ -1,6 +1,6 @@
 [project]
 name = "scrapling-fetch-mcp"
-version = "0.1.3"
+version = "0.1.4"
 description = "Helps LLMs access bot-protected websites. An MCP server that fetches HTML/markdown content from sites with anti-automation defenses using Scrapling."
 readme = "README.md"
 authors = [
