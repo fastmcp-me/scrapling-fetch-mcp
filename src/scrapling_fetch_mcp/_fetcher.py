@@ -1,5 +1,6 @@
-import functools
-import re
+from functools import reduce
+from re import compile
+from re import error as re_error
 from typing import Optional
 
 from bs4 import BeautifulSoup
@@ -55,11 +56,6 @@ class UrlFetchResponse(BaseModel):
         match_count: Optional[int] = None
 
 
-def _extract_content(page, request) -> str:
-    is_markdown = request.format == "markdown"
-    return _html_to_markdown(page.html_content) if is_markdown else page.html_content
-
-
 def _html_to_markdown(html: str) -> str:
     soup = BeautifulSoup(html, "lxml")
     for script in soup(["script", "style"]):
@@ -72,7 +68,7 @@ def _search_content(
     content: str, pattern: str, context_chars: int = 200
 ) -> tuple[str, int]:
     try:
-        matches = list(re.compile(pattern).finditer(content))
+        matches = list(compile(pattern).finditer(content))
         if not matches:
             return "", 0
         chunks = [
@@ -82,7 +78,7 @@ def _search_content(
             )
             for match in matches
         ]
-        merged_chunks = functools.reduce(
+        merged_chunks = reduce(
             lambda acc, chunk: (
                 [*acc[:-1], (acc[-1][0], max(acc[-1][1], chunk[1]))]
                 if acc and chunk[0] <= acc[-1][1]
@@ -93,7 +89,7 @@ def _search_content(
         )
         result_sections = [content[start:end] for start, end in merged_chunks]
         return "\n...\n".join(result_sections), len(matches)
-    except re.error as e:
+    except re_error as e:
         return f"ERROR: Invalid regex pattern: {str(e)}", 0
 
 
@@ -144,6 +140,11 @@ def _regular_req(
         start_index=request.start_index,
     )
     return truncated_content, metadata
+
+
+def _extract_content(page, request) -> str:
+    is_markdown = request.format == "markdown"
+    return _html_to_markdown(page.html_content) if is_markdown else page.html_content
 
 
 async def fetch_url(request: UrlFetchRequest) -> UrlFetchResponse:

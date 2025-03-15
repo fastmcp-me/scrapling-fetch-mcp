@@ -1,15 +1,15 @@
 # from https://github.com/microsoft/markitdown/blob/main/packages/markitdown/src/markitdown/converters/_markdownify.py
 
-import re
+from re import search
 from typing import Any, Optional
 from urllib.parse import quote, unquote, urlparse, urlunparse
 
-import markdownify
+from markdownify import ATX, MarkdownConverter, chomp
 
 
-class _CustomMarkdownify(markdownify.MarkdownConverter):
+class _CustomMarkdownify(MarkdownConverter):
     def __init__(self, **options: Any):
-        options["heading_style"] = options.get("heading_style", markdownify.ATX)
+        options["heading_style"] = options.get("heading_style", ATX)
         super().__init__(**options)
 
     def convert_hn(
@@ -21,7 +21,7 @@ class _CustomMarkdownify(markdownify.MarkdownConverter):
         **kwargs,
     ) -> str:
         if not convert_as_inline:
-            if not re.search(r"^\n", text):
+            if not search(r"^\n", text):
                 return "\n" + super().convert_hn(n, el, text, convert_as_inline)  # type: ignore
 
         return super().convert_hn(n, el, text, convert_as_inline)  # type: ignore
@@ -33,7 +33,7 @@ class _CustomMarkdownify(markdownify.MarkdownConverter):
         convert_as_inline: Optional[bool] = False,
         **kwargs,
     ):
-        prefix, suffix, text = markdownify.chomp(text)  # type: ignore
+        prefix, suffix, text = chomp(text)  # type: ignore
         if not text:
             return ""
         if el.find_parent("pre") is not None:
