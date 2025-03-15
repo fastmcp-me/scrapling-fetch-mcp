@@ -1461,10 +1461,11 @@ wheels = [
 
 [[package]]
 name = "scrapling-fetch-mcp"
-version = "0.1.2"
+version = "0.1.3"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
+    { name = "lxml" },
     { name = "markdownify" },
     { name = "mcp" },
     { name = "packaging" },
@@ -1473,7 +1474,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "beautifulsoup4" },
+    { name = "beautifulsoup4", specifier = ">=4.13.3" },
+    { name = "lxml", specifier = ">=5.3.1" },
     { name = "markdownify", specifier = ">=1.1.0" },
     { name = "mcp", specifier = ">=1.4.0" },
     { name = "packaging", specifier = ">=24.1,<25.0" },

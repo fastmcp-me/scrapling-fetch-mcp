@@ -69,7 +69,7 @@ def _extract_content(page, request) -> str:
 
 
 def _html_to_markdown(html: str) -> str:
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, "lxml")
     for script in soup(["script", "style"]):
         script.extract()
     body_elm = soup.find("body")
