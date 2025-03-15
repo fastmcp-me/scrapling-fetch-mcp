@@ -3,11 +3,11 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![PyPI version](https://img.shields.io/pypi/v/scrapling-fetch-mcp.svg)](https://pypi.org/project/scrapling-fetch-mcp/)
 
-An MCP server that helps AI assistants access bot-protected websites, retrieving content in HTML or markdown format.
+An MCP server that helps AI assistants access text content from websites that implement bot detection, bridging the gap between what you can see in your browser and what the AI can access.
 
-## Overview
+## Intended Use
 
-This tool enables AI assistants to access content from websites that implement bot detection, bridging the gap between what you can see in your browser and what the AI can access.
+This tool is optimized for low-volume retrieval of documentation and reference materials (text/HTML only) from websites that implement bot detection. It has not been designed or tested for general-purpose site scraping or data harvesting.
 
 > **Note**: This project was developed in collaboration with Claude Sonnet 3.7, using [LLM Context](https://github.com/cyberchitta/llm-context.py).
 
@@ -76,7 +76,8 @@ Based on the documentation I retrieved, here's a summary...
 
 ## Limitations
 
-- Not designed for high-volume scraping
+- **Designed only for text content**: Specifically for documentation, articles, and reference materials
+- Not designed for high-volume scraping or data harvesting
 - May not work with sites requiring authentication
 - Performance varies by site complexity
 
