@@ -18,7 +18,7 @@ dependencies = [
     "markdownify>=1.1.0",
     "mcp>=1.4.0",
     "packaging>=24.1, <25.0",
-    "scrapling>=0.2.96",
+    "scrapling>=0.2.97",
 ]
 
 [project.urls]

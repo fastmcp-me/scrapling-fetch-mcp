@@ -1440,7 +1440,7 @@ wheels = [
 
 [[package]]
 name = "scrapling"
-version = "0.2.96"
+version = "0.2.97"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "camoufox", extra = ["geoip"] },
@@ -1454,9 +1454,9 @@ dependencies = [
     { name = "tldextract" },
     { name = "w3lib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b0/39/cb21cd5b8a6a64f011d6b7a26753aa79e10ec41ce9979249f7daebfbf9ac/scrapling-0.2.96.tar.gz", hash = "sha256:b9df166f94cf3eb1a73d8a031ab8d9cac3e84372825b3d609fef9e63c22486b8", size = 109482 }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/61/689501e80fd1f6c205b6786d16251f94a6b886ce036ed1b67ff83404badd/scrapling-0.2.97.tar.gz", hash = "sha256:3e92f29b2162e39f3b428287b992d277bbaf67147a620082811b6213b9ea1a99", size = 110411 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b2/a5/940544b28565ab357e0b331f81111c16b50404dc8544d6ddf35958c7f1c2/scrapling-0.2.96-py3-none-any.whl", hash = "sha256:5eb225ba655e5d3a0f24de9ef41276d74ec6da8839fe5a2763bba336e65bcc63", size = 89502 },
+    { url = "https://files.pythonhosted.org/packages/35/e3/0881be8f5b8ede90e84eec0cd467f5ae971ac0429f8c558124d9027531ac/scrapling-0.2.97-py3-none-any.whl", hash = "sha256:d898314db3cd1d83d3bcda8df71b41b62c6fe3766345ed42e2acd6fffa005743", size = 90270 },
 ]
 
 [[package]]
@@ -1479,7 +1479,7 @@ requires-dist = [
     { name = "markdownify", specifier = ">=1.1.0" },
     { name = "mcp", specifier = ">=1.4.0" },
     { name = "packaging", specifier = ">=24.1,<25.0" },
-    { name = "scrapling", specifier = ">=0.2.96" },
+    { name = "scrapling", specifier = ">=0.2.97" },
 ]
 
 [[package]]
