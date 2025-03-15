@@ -1,4 +1,6 @@
-from typing import Any
+import functools
+import re
+from typing import Any, Optional
 
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
@@ -26,6 +28,15 @@ class UrlFetchRequest(BaseModel):
         ge=0,
         title="Start Index",
     )
+    search_pattern: str = Field(
+        None,
+        description="Regular expression pattern to search for in the content",
+    )
+    context_chars: int = Field(
+        200,
+        description="Number of characters to include before and after each match",
+        ge=0,
+    )
 
 
 class UrlFetchResponse(BaseModel):
@@ -36,11 +47,12 @@ class UrlFetchResponse(BaseModel):
     )
 
     class Metadata(BaseModel):
-        total_length: int = 0
-        retrieved_length: int = 0
-        is_truncated: bool = False
-        start_index: int = 0
-        percent_retrieved: float = 100.0
+        total_length: int
+        retrieved_length: int
+        is_truncated: bool
+        percent_retrieved: float
+        start_index: Optional[int] = None
+        match_count: Optional[int] = None
 
 
 async def browse_url(request: UrlFetchRequest) -> Any:
@@ -76,23 +88,90 @@ def _html_to_markdown(html: str) -> str:
     return _CustomMarkdownify().convert_soup(body_elm if body_elm else soup)
 
 
-async def fetch_url(request: UrlFetchRequest) -> UrlFetchResponse:
-    page = await browse_url(request)
-    full_content = _extract_content(page, request)
+def _search_content(
+    content: str, pattern: str, context_chars: int = 200
+) -> tuple[str, int]:
+    try:
+        matches = list(re.compile(pattern).finditer(content))
+        if not matches:
+            return "", 0
+        chunks = [
+            (
+                max(0, match.start() - context_chars),
+                min(len(content), match.end() + context_chars),
+            )
+            for match in matches
+        ]
+        merged_chunks = functools.reduce(
+            lambda acc, chunk: (
+                [*acc[:-1], (acc[-1][0], max(acc[-1][1], chunk[1]))]
+                if acc and chunk[0] <= acc[-1][1]
+                else [*acc, chunk]
+            ),
+            chunks,
+            [],
+        )
+        result_sections = [content[start:end] for start, end in merged_chunks]
+        return "\n...\n".join(result_sections), len(matches)
+    except re.error as e:
+        return f"ERROR: Invalid regex pattern: {str(e)}", 0
+
+
+def _search_req(
+    full_content: str, request: UrlFetchRequest
+) -> tuple[str, UrlFetchResponse.Metadata]:
+    original_length = len(full_content)
+    matched_content, match_count = _search_content(
+        full_content, request.search_pattern, request.context_chars
+    )
+    if not matched_content:
+        return "", UrlFetchResponse.Metadata(
+            total_length=original_length,
+            retrieved_length=0,
+            is_truncated=False,
+            percent_retrieved=0,
+            match_count=0,
+        )
+    truncated_content = matched_content[: request.max_length]
+    is_truncated = len(matched_content) > request.max_length
+    metadata = UrlFetchResponse.Metadata(
+        total_length=original_length,
+        retrieved_length=len(truncated_content),
+        is_truncated=is_truncated,
+        percent_retrieved=round((len(truncated_content) / original_length) * 100, 2)
+        if original_length > 0
+        else 100,
+        match_count=match_count,
+    )
+    return truncated_content, metadata
+
+
+def _regular_req(
+    full_content: str, request: UrlFetchRequest
+) -> tuple[str, UrlFetchResponse.Metadata]:
     total_length = len(full_content)
     truncated_content = full_content[
         request.start_index : request.start_index + request.max_length
     ]
     is_truncated = total_length > (request.start_index + request.max_length)
-    return UrlFetchResponse(
-        content=truncated_content,
-        metadata=UrlFetchResponse.Metadata(
-            total_length=total_length,
-            retrieved_length=len(truncated_content),
-            is_truncated=is_truncated,
-            start_index=request.start_index,
-            percent_retrieved=round((len(truncated_content) / total_length) * 100, 2)
-            if total_length > 0
-            else 100,
-        ),
+    metadata = UrlFetchResponse.Metadata(
+        total_length=total_length,
+        retrieved_length=len(truncated_content),
+        is_truncated=is_truncated,
+        percent_retrieved=round((len(truncated_content) / total_length) * 100, 2)
+        if total_length > 0
+        else 100,
+        start_index=request.start_index,
     )
+    return truncated_content, metadata
+
+
+async def fetch_url(request: UrlFetchRequest) -> UrlFetchResponse:
+    page = await browse_url(request)
+    full_content = _extract_content(page, request)
+    content, metadata = (
+        _search_req(full_content, request)
+        if request.search_pattern
+        else _regular_req(full_content, request)
+    )
+    return UrlFetchResponse(content=content, metadata=metadata)

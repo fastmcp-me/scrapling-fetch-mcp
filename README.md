@@ -18,6 +18,7 @@ This tool is optimized for low volume retrieval of documentation and reference m
 * Three protection levels (basic, stealth, max-stealth)
 * Two output formats (HTML, markdown)
 * Pagination support for large documents
+* Regular expression search to extract specific content with surrounding context
 
 ## Installation
 
@@ -97,6 +98,8 @@ Fetch a URL with configurable bot-detection avoidance levels.
 - **format** (optional, default: "markdown"): Output format (options: `html`, `markdown`)
 - **max_length** (optional, default: 5000): Maximum number of characters to return
 - **start_index** (optional, default: 0): Character index to start from in the response (for paginated content)
+- **search_pattern** (optional): Regular expression pattern to search for in the content. When provided, only matching sections with context will be returned
+- **context_chars** (optional, default: 200): Number of characters to include before and after each match when using search_pattern
 
 #### Response Format
 
@@ -109,6 +112,36 @@ METADATA: {"total_length": 8500, "retrieved_length": 5000, "is_truncated": true,
 ```
 
 For large documents, use the `start_index` parameter with the `total_length` from the metadata to paginate through the content.
+
+#### Search Functionality
+
+When using `search_pattern`, the response includes different metadata:
+
+```
+METADATA: {"total_length": 8500, "retrieved_length": 1024, "is_truncated": false, "percent_retrieved": 12.05, "match_count": 3}
+
+[Matching content with context...]
+```
+
+The `match_count` field indicates how many matches were found for your pattern. Sections of matching content are separated by "..." when they're not adjacent.
+
+Example request with search:
+
+```json
+{
+  "name": "scrapling-fetch",
+  "arguments": {
+    "url": "https://example.com/docs",
+    "mode": "basic",
+    "format": "markdown",
+    "max_length": 10000,
+    "search_pattern": "API\\s+Reference",
+    "context_chars": 300
+  }
+}
+```
+
+This would return only the sections containing "API Reference" (with flexible whitespace) plus 300 characters before and after each match.
 
 ## Performance and Trade-offs
 
