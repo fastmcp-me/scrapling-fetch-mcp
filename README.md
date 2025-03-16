@@ -39,7 +39,16 @@ Add this configuration to your Claude client's MCP server configuration:
 }
 ```
 
+## Available Tools
+
+This package provides two distinct tools:
+
+1. **s-fetch-page**: Retrieves complete web pages with pagination support
+2. **s-fetch-pattern**: Extracts content matching regex patterns with surrounding context
+
 ## Example Usage
+
+### Fetching a Complete Page
 
 ```
 Human: Please fetch and summarize the documentation at https://example.com/docs
@@ -47,13 +56,33 @@ Human: Please fetch and summarize the documentation at https://example.com/docs
 Claude: I'll help you with that. Let me fetch the documentation.
 
 <mcp:function_calls>
-<mcp:invoke name="scrapling-fetch">
+<mcp:invoke name="s-fetch-page">
 <mcp:parameter name="url">https://example.com/docs</mcp:parameter>
 <mcp:parameter name="mode">basic</mcp:parameter>
 </mcp:invoke>
 </mcp:function_calls>
 
 Based on the documentation I retrieved, here's a summary...
+```
+
+### Extracting Specific Content with Pattern Matching
+
+```
+Human: Please find all mentions of "API keys" on the documentation page.
+
+Claude: I'll search for that specific information.
+
+<mcp:function_calls>
+<mcp:invoke name="s-fetch-pattern">
+<mcp:parameter name="url">https://example.com/docs</mcp:parameter>
+<mcp:parameter name="mode">basic</mcp:parameter>
+<mcp:parameter name="search_pattern">API\s+keys?</mcp:parameter>
+<mcp:parameter name="context_chars">150</mcp:parameter>
+</mcp:invoke>
+</mcp:function_calls>
+
+I found several mentions of API keys in the documentation:
+...
 ```
 
 ## Functionality Options
@@ -63,15 +92,15 @@ Based on the documentation I retrieved, here's a summary...
   - `stealth`: Balanced protection (3-8 seconds) that works with most sites
   - `max-stealth`: Maximum protection (10+ seconds) for heavily protected sites
 
-- **Content Targeting**:
-  - Retrieve entire pages or specific sections using regular expression search
-  - Navigate large documents with pagination support
+- **Content Targeting Options**:
+  - **s-fetch-page**: Retrieve entire pages with pagination support (using `start_index` and `max_length`)
+  - **s-fetch-pattern**: Extract specific content using regular expressions (with `search_pattern` and `context_chars`)
 
 ## Tips for Best Results
 
 - Start with `basic` mode and only escalate to higher protection levels if needed
-- For large documents, the AI can retrieve content in chunks
-- Use the search functionality when looking for specific information on large pages
+- For large documents, use the pagination parameters with `s-fetch-page`
+- Use `s-fetch-pattern` when looking for specific information on large pages
 - The AI will automatically adjust its approach based on the site's protection level
 
 ## Limitations

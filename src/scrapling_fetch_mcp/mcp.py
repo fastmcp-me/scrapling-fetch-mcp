@@ -11,17 +11,12 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INTERNAL_ERROR, INVALID_PARAMS, ErrorData, TextContent, Tool
 from pydantic import ValidationError
 
-from scrapling_fetch_mcp._fetcher import UrlFetchRequest, fetch_url
-
-scrapling_fetch_tool = Tool(
-    name="scrapling-fetch",
-    description="Fetches a URL using Scrapling with bot-detection avoidance. "
-    "IMPORTANT: This tool supports two main approaches: (1) retrieving full pages or "
-    "(2) targeted content extraction using regex search patterns with context. "
-    "For best performance, start with 'basic' mode (fastest), then only escalate to "
-    "'stealth' or 'max-stealth' modes if basic mode fails. "
-    "Content is returned with JSON metadata about length, truncation, and retrieval statistics.",
-    inputSchema=UrlFetchRequest.model_json_schema(),
+from scrapling_fetch_mcp._fetcher import fetch_page, fetch_pattern
+from scrapling_fetch_mcp.tools import (
+    PageFetchRequest,
+    PatternFetchRequest,
+    s_fetch_page_tool,
+    s_fetch_pattern_tool,
 )
 
 
@@ -30,15 +25,23 @@ async def serve() -> None:
 
     @server.list_tools()
     async def handle_list_tools() -> list[Tool]:
-        return [scrapling_fetch_tool]
+        return [s_fetch_page_tool, s_fetch_pattern_tool]
 
     @server.call_tool()
     async def handle_call_tool(name: str, arguments: dict) -> list[TextContent]:
         try:
             with open(devnull, "w") as nullfd, redirect_stdout(nullfd):
-                if name == "scrapling-fetch":
-                    request = UrlFetchRequest(**arguments)
-                    result = await fetch_url(request)
+                if name == "s-fetch-page":
+                    request = PageFetchRequest(**arguments)
+                    result = await fetch_page(request)
+                    metadata_json = result.metadata.model_dump_json()
+                    content_with_metadata = (
+                        f"METADATA: {metadata_json}\n\n{result.content}"
+                    )
+                    return [TextContent(type="text", text=content_with_metadata)]
+                elif name == "s-fetch-pattern":
+                    request = PatternFetchRequest(**arguments)
+                    result = await fetch_pattern(request)
                     metadata_json = result.metadata.model_dump_json()
                     content_with_metadata = (
                         f"METADATA: {metadata_json}\n\n{result.content}"

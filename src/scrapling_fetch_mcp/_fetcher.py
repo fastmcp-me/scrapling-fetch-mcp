@@ -8,36 +8,7 @@ from pydantic import BaseModel, Field
 
 from scrapling_fetch_mcp._markdownify import _CustomMarkdownify
 from scrapling_fetch_mcp._scrapling import browse_url
-
-
-class UrlFetchRequest(BaseModel):
-    url: str = Field(..., description="URL to fetch")
-    mode: str = Field(
-        "basic", description="Fetching mode (basic, stealth, or max-stealth)"
-    )
-    format: str = Field("markdown", description="Output format (html or markdown)")
-    max_length: int = Field(
-        5000,
-        description="Maximum number of characters to return.",
-        gt=0,
-        lt=1000000,
-        title="Max Length",
-    )
-    start_index: int = Field(
-        0,
-        description="On return output starting at this character index, useful if a previous fetch was truncated and more context is required.",
-        ge=0,
-        title="Start Index",
-    )
-    search_pattern: str = Field(
-        None,
-        description="Regular expression pattern to search for in the content",
-    )
-    context_chars: int = Field(
-        200,
-        description="Number of characters to include before and after each match",
-        ge=0,
-    )
+from scrapling_fetch_mcp.tools import PageFetchRequest, PatternFetchRequest
 
 
 class UrlFetchResponse(BaseModel):
@@ -94,7 +65,7 @@ def _search_content(
 
 
 def _search_req(
-    full_content: str, request: UrlFetchRequest
+    full_content: str, request: PatternFetchRequest
 ) -> tuple[str, UrlFetchResponse.Metadata]:
     original_length = len(full_content)
     matched_content, match_count = _search_content(
@@ -123,7 +94,7 @@ def _search_req(
 
 
 def _regular_req(
-    full_content: str, request: UrlFetchRequest
+    full_content: str, request: PageFetchRequest
 ) -> tuple[str, UrlFetchResponse.Metadata]:
     total_length = len(full_content)
     truncated_content = full_content[
@@ -147,12 +118,15 @@ def _extract_content(page, request) -> str:
     return _html_to_markdown(page.html_content) if is_markdown else page.html_content
 
 
-async def fetch_url(request: UrlFetchRequest) -> UrlFetchResponse:
+async def fetch_page(request: PageFetchRequest) -> UrlFetchResponse:
     page = await browse_url(request.url, request.mode)
     full_content = _extract_content(page, request)
-    content, metadata = (
-        _search_req(full_content, request)
-        if request.search_pattern
-        else _regular_req(full_content, request)
-    )
+    content, metadata = _regular_req(full_content, request)
+    return UrlFetchResponse(content=content, metadata=metadata)
+
+
+async def fetch_pattern(request: PatternFetchRequest) -> UrlFetchResponse:
+    page = await browse_url(request.url, request.mode)
+    full_content = _extract_content(page, request)
+    content, metadata = _search_req(full_content, request)
     return UrlFetchResponse(content=content, metadata=metadata)
