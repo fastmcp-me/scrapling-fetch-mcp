@@ -1,7 +1,9 @@
-import asyncio
-import logging
-import traceback
+from asyncio import run
+from contextlib import redirect_stdout
 from importlib.metadata import version as pkg_ver
+from logging import getLogger
+from os import devnull
+from traceback import format_exc
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -33,22 +35,25 @@ async def serve() -> None:
     @server.call_tool()
     async def handle_call_tool(name: str, arguments: dict) -> list[TextContent]:
         try:
-            if name == "scrapling-fetch":
-                request = UrlFetchRequest(**arguments)
-                result = await fetch_url(request)
-                metadata_json = result.metadata.model_dump_json()
-                content_with_metadata = f"METADATA: {metadata_json}\n\n{result.content}"
-                return [TextContent(type="text", text=content_with_metadata)]
-            else:
-                raise McpError(
-                    ErrorData(code=INVALID_PARAMS, message=f"Unknown tool: {name}")
-                )
+            with open(devnull, "w") as nullfd, redirect_stdout(nullfd):
+                if name == "scrapling-fetch":
+                    request = UrlFetchRequest(**arguments)
+                    result = await fetch_url(request)
+                    metadata_json = result.metadata.model_dump_json()
+                    content_with_metadata = (
+                        f"METADATA: {metadata_json}\n\n{result.content}"
+                    )
+                    return [TextContent(type="text", text=content_with_metadata)]
+                else:
+                    raise McpError(
+                        ErrorData(code=INVALID_PARAMS, message=f"Unknown tool: {name}")
+                    )
         except ValidationError as e:
             raise McpError(ErrorData(code=INVALID_PARAMS, message=str(e)))
         except Exception as e:
-            logger = logging.getLogger("scrapling_fetch_mcp")
+            logger = getLogger("scrapling_fetch_mcp")
             logger.error("DETAILED ERROR IN %s: %s", name, str(e))
-            logger.error("TRACEBACK: %s", traceback.format_exc())
+            logger.error("TRACEBACK: %s", format_exc())
             raise McpError(
                 ErrorData(
                     code=INTERNAL_ERROR, message=f"Error processing {name}: {str(e)}"
@@ -65,7 +70,7 @@ async def serve() -> None:
 
 
 def run_server():
-    asyncio.run(serve())
+    run(serve())
 
 
 if __name__ == "__main__":
