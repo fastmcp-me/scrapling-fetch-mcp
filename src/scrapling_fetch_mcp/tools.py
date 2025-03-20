@@ -53,7 +53,8 @@ s_fetch_page_tool = Tool(
     "Retrieves content from websites with bot-detection avoidance. "
     "For best performance, start with 'basic' mode (fastest), then only escalate to "
     "'stealth' or 'max-stealth' modes if basic mode fails. "
-    "Content is returned with metadata about length and truncation status.",
+    "Content is returned as 'METADATA: {json}\\n\\n[content]' where metadata includes "
+    "length information and truncation status.",
     inputSchema=PageFetchRequest.model_json_schema(),
 )
 
@@ -63,6 +64,7 @@ s_fetch_pattern_tool = Tool(
     "Retrieves specific content from websites with bot-detection avoidance. "
     "For best performance, start with 'basic' mode (fastest), then only escalate to "
     "'stealth' or 'max-stealth' modes if basic mode fails. "
-    "Returns matched content with surrounding context and match statistics.",
+    "Returns matched content as 'METADATA: {json}\\n\\n[content]' where metadata includes "
+    "match statistics and truncation information.",
     inputSchema=PatternFetchRequest.model_json_schema(),
 )
