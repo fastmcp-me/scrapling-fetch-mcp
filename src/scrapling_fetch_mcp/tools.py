@@ -65,6 +65,9 @@ s_fetch_pattern_tool = Tool(
     "For best performance, start with 'basic' mode (fastest), then only escalate to "
     "'stealth' or 'max-stealth' modes if basic mode fails. "
     "Returns matched content as 'METADATA: {json}\\n\\n[content]' where metadata includes "
-    "match statistics and truncation information.",
+    "match statistics and truncation information. Each matched content chunk is "
+    "delimited with '॥๛॥' and prefixed with '[Position: start-end]' indicating its byte position "
+    "in the original document, allowing targeted follow-up requests with s-fetch-page using "
+    "specific start_index values.",
     inputSchema=PatternFetchRequest.model_json_schema(),
 )

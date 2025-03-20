@@ -58,8 +58,11 @@ def _search_content(
             chunks,
             [],
         )
-        result_sections = [content[start:end] for start, end in merged_chunks]
-        return "\n...\n".join(result_sections), len(matches)
+        result_sections = [
+            f"॥๛॥\n[Position: {start}-{end}]\n{content[start:end]}" 
+            for start, end in merged_chunks
+        ]
+        return "\n".join(result_sections), len(matches)
     except re_error as e:
         return f"ERROR: Invalid regex pattern: {str(e)}", 0
 
