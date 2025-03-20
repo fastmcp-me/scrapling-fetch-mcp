@@ -95,6 +95,7 @@ I found several mentions of API keys in the documentation:
 - **Content Targeting Options**:
   - **s-fetch-page**: Retrieve entire pages with pagination support (using `start_index` and `max_length`)
   - **s-fetch-pattern**: Extract specific content using regular expressions (with `search_pattern` and `context_chars`)
+    - Results include position information for follow-up queries with `s-fetch-page`
 
 ## Tips for Best Results
 
