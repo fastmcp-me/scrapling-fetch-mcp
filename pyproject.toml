@@ -1,6 +1,6 @@
 [project]
 name = "scrapling-fetch-mcp"
-version = "0.1.5"
+version = "0.1.6"
 description = "Helps AI assistants access text content from bot-protected websites. MCP server that fetches HTML/markdown from sites with anti-automation measures using Scrapling."
 readme = "README.md"
 authors = [
@@ -18,7 +18,7 @@ dependencies = [
     "markdownify>=1.1.0",
     "mcp>=1.4.0",
     "packaging>=24.1, <25.0",
-    "scrapling>=0.2.97",
+    "scrapling>=0.2.98",
 ]
 
 [project.urls]
